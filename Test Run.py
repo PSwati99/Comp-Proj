@@ -11,6 +11,7 @@ Modifications for Faster Execution:
     - Reduced Monte Carlo runs: 50 per frequency
     - Reduced frequency points: 1,000 (instead of 50,000)
     - Single-core execution (No MPI needed)
+    - Step-by-step progress updates during execution
 
 Author: [Your Name]
 Date: [Today's Date]
@@ -19,6 +20,7 @@ Date: [Today's Date]
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
+import time
 
 # =============================================================================
 # Material and Simulation Parameters
@@ -64,15 +66,26 @@ def domain_wall_ode(t, y, T, u):
 # =============================================================================
 def run_monte_carlo(f_GHz, runs=50):
     """Runs Monte Carlo simulations for a given frequency with random noise."""
+    print(f"Running Monte Carlo simulation for {f_GHz} GHz...")
+
     T = transmission_coefficient(f_GHz)
     u = u_const
     results = np.zeros(num_t_points)
     
-    for _ in range(runs):
+    start_time = time.time()
+    
+    for i in range(runs):
+        if i % 10 == 0:  # Print progress every 10 runs
+            elapsed_time = time.time() - start_time
+            estimated_total = (elapsed_time / (i+1)) * runs
+            print(f"  Progress: {i}/{runs} runs completed. Estimated time left: {estimated_total - elapsed_time:.1f} sec")
+
         y0 = [0.0, np.pi/2 + np.random.normal(0, 0.01)]
         sol = solve_ivp(domain_wall_ode, [t_start, t_end], y0, args=(T, u),
                         t_eval=t_eval, rtol=1e-8, atol=1e-10)
         results += sol.y[0]
+
+    print(f"Completed {runs} Monte Carlo runs for {f_GHz} GHz.\n")
     
     return t_eval, results / runs  
 
@@ -81,13 +94,25 @@ def run_monte_carlo(f_GHz, runs=50):
 # =============================================================================
 def run_velocity_sweep():
     """Computes initial and steady-state domain wall velocities."""
-    velocity_results = []
+    print("Running velocity sweep over test frequencies...\n")
 
-    for f in test_frequencies:
+    velocity_results = []
+    total_frequencies = len(test_frequencies)
+    
+    start_time = time.time()
+
+    for i, f in enumerate(test_frequencies):
         t, X_avg = run_monte_carlo(f, runs=50)
         dXdt_initial = (X_avg[1] - X_avg[0]) / (t[1] - t[0])
         dXdt_steady = (X_avg[-1] - X_avg[-2]) / (t[-1] - t[-2])
         velocity_results.append((f, dXdt_initial, dXdt_steady))
+
+        if i % 100 == 0:  # Print progress every 100 frequencies
+            elapsed_time = time.time() - start_time
+            estimated_total = (elapsed_time / (i+1)) * total_frequencies
+            print(f"  Frequency Progress: {i}/{total_frequencies} processed. Estimated time left: {estimated_total - elapsed_time:.1f} sec")
+
+    print("Velocity sweep completed.\n")
     
     return np.array(velocity_results)
 
@@ -103,6 +128,8 @@ def spin_wave_amplitude(f_GHz):
 # =============================================================================
 def plot_displacement_curves():
     """Plot domain wall displacement vs. time for f = 22 GHz and f = 70 GHz."""
+    print("Generating domain wall displacement plot...\n")
+
     freqs = [22, 70]
     plt.figure(figsize=(8,6))
     for f in freqs:
@@ -118,6 +145,8 @@ def plot_displacement_curves():
 
 def plot_velocity_curves(velocity_data):
     """Plot initial and steady-state velocity vs. frequency."""
+    print("Generating velocity vs. frequency plot...\n")
+
     frequencies = velocity_data[:,0]
     initial_vel = velocity_data[:,1]
     steady_vel = velocity_data[:,2]
@@ -135,6 +164,8 @@ def plot_velocity_curves(velocity_data):
 
 def plot_transmission_and_amplitude():
     """Plot transmission coefficient and spin-wave amplitude vs. frequency."""
+    print("Generating transmission coefficient and amplitude plot...\n")
+
     frequencies = test_frequencies
     T_vals = np.array([transmission_coefficient(f) for f in frequencies])
     amp_vals = np.array([spin_wave_amplitude(f) for f in frequencies])
@@ -154,12 +185,12 @@ def plot_transmission_and_amplitude():
 # Main Execution
 # =============================================================================
 def main():
+    print("Starting test simulation...\n")
     velocity_data = run_velocity_sweep()
-    
-    # Generate the four graphs for comparison
     plot_displacement_curves()
     plot_velocity_curves(velocity_data)
     plot_transmission_and_amplitude()
+    print("Test simulation completed!\n")
 
 if __name__ == "__main__":
     main()
