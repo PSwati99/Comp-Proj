@@ -1,16 +1,14 @@
 #!/usr/bin/env python3
 """
-Test Code for Spin-Wave–Induced Domain Wall Motion Simulation
+Optimized Test Code for Spin-Wave–Induced Domain Wall Motion Simulation
 
-This is a scaled-down version of the full MPI simulation to run on a laptop 
-in approximately 15-20 minutes. It generates all four graphs for comparison 
-with the full simulation and the original paper.
+This test version runs in ~5 minutes and generates all four graphs.
+It is designed for quick validation before running the full MPI simulation.
 
 Modifications for Faster Execution:
-    - Reduced simulation time: 1000 ns (1,000,000 time steps)
-    - Reduced Monte Carlo runs: 50 per frequency
-    - Reduced frequency points: 1,000 (instead of 50,000)
-    - Single-core execution (No MPI needed)
+    - Reduced simulation time: 1000 ns (500,000 time steps)
+    - Reduced Monte Carlo runs: 10 per frequency
+    - Reduced frequency points: 500
     - Step-by-step progress updates during execution
 
 Author: [Your Name]
@@ -35,15 +33,15 @@ A_const = gamma * K_d / (mu0 * Ms)
 u_const = 10.0        
 
 # =============================================================================
-# Test Simulation Parameters (Optimized for Laptop)
+# Test Simulation Parameters (Optimized for ~5 Min Runtime)
 # =============================================================================
 t_start = 0.0
 t_end = 1e-6        
-num_t_points = 1000000   # 1M time steps (instead of 10M)
+num_t_points = 500000   # 500K time steps (instead of 1M)
 t_eval = np.linspace(t_start, t_end, num_t_points)
 
-# Frequency sweep reduced from 50,000 to 1,000 points
-test_frequencies = np.linspace(20, 80, 1000)
+# Frequency sweep reduced from 50,000 to 500 points
+test_frequencies = np.linspace(20, 80, 500)
 
 # =============================================================================
 # Transmission Coefficient Function
@@ -64,7 +62,7 @@ def domain_wall_ode(t, y, T, u):
 # =============================================================================
 # Monte Carlo Simulation for a Given Frequency
 # =============================================================================
-def run_monte_carlo(f_GHz, runs=50):
+def run_monte_carlo(f_GHz, runs=10):
     """Runs Monte Carlo simulations for a given frequency with random noise."""
     print(f"Running Monte Carlo simulation for {f_GHz} GHz...")
 
@@ -75,7 +73,7 @@ def run_monte_carlo(f_GHz, runs=50):
     start_time = time.time()
     
     for i in range(runs):
-        if i % 10 == 0:  # Print progress every 10 runs
+        if i % 5 == 0:  # Print progress every 5 runs
             elapsed_time = time.time() - start_time
             estimated_total = (elapsed_time / (i+1)) * runs
             print(f"  Progress: {i}/{runs} runs completed. Estimated time left: {estimated_total - elapsed_time:.1f} sec")
@@ -102,12 +100,12 @@ def run_velocity_sweep():
     start_time = time.time()
 
     for i, f in enumerate(test_frequencies):
-        t, X_avg = run_monte_carlo(f, runs=50)
+        t, X_avg = run_monte_carlo(f, runs=10)
         dXdt_initial = (X_avg[1] - X_avg[0]) / (t[1] - t[0])
         dXdt_steady = (X_avg[-1] - X_avg[-2]) / (t[-1] - t[-2])
         velocity_results.append((f, dXdt_initial, dXdt_steady))
 
-        if i % 100 == 0:  # Print progress every 100 frequencies
+        if i % 50 == 0:  # Print progress every 50 frequencies
             elapsed_time = time.time() - start_time
             estimated_total = (elapsed_time / (i+1)) * total_frequencies
             print(f"  Frequency Progress: {i}/{total_frequencies} processed. Estimated time left: {estimated_total - elapsed_time:.1f} sec")
@@ -133,7 +131,7 @@ def plot_displacement_curves():
     freqs = [22, 70]
     plt.figure(figsize=(8,6))
     for f in freqs:
-        t, X_avg = run_monte_carlo(f, runs=50)
+        t, X_avg = run_monte_carlo(f, runs=10)
         plt.plot(t*1e9, X_avg, label=f'{f} GHz')
     plt.xlabel("Time (ns)")
     plt.ylabel("Domain Wall Displacement (m)")
