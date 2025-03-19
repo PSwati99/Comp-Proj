@@ -17,17 +17,17 @@ u_const = 10.0       # Effective magnon velocity (m/s)
 # =============================================================================
 t_start = 0.0
 t_end = 1e-6           # 1000 ns (Extended simulation)
-num_t_points = 1000000  # 1,000,000 time steps
+num_t_points = 10000000  # 10,000,000 time steps
 t_eval = np.linspace(t_start, t_end, num_t_points)
 
 # =============================================================================
 # Monte Carlo Sampling Parameters
 # =============================================================================
-monte_carlo_runs = 50
+monte_carlo_runs = 5000
 
 # =============================================================================
 # Frequency Range
 # =============================================================================
 freq_min = 20
 freq_max = 80
-num_freq_points = 5001
+num_freq_points = 50000
