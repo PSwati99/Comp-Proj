@@ -70,6 +70,6 @@ plt.ylim(-60, 1200)
 plt.tight_layout()
 
 # Save the figure as a PNG file
-plt.savefig("domain_wall_displacement.png", dpi=300)
+plt.savefig("2domain_wall_displacement.png", dpi=300)
 plt.show()
 
