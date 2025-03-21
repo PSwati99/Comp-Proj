@@ -53,7 +53,7 @@ num_t_points = 500000        # 500K time steps for faster runtime
 t_eval = np.linspace(t_start, t_end, num_t_points)
 
 # Frequency sweep for testing: 50 points from 20 to 80 GHz
-test_frequencies = np.linspace(20, 80, 50)
+test_frequencies = np.linspace(20, 80, 55)
 
 # =============================================================================
 # One-Dimensional Model ODE System (from paper)
@@ -171,7 +171,7 @@ def plot_displacement_curves():
     plt.figure(figsize=(8, 6))
     for f in freqs_to_plot:
         t, X_avg = run_monte_carlo(f, runs=10)
-        plt.plot(t * 1e9, X_avg, label=f"{f} GHz")
+        plt.plot(t * 1e9, X_avg * 1e9, label=f"{f} GHz")
     plt.xlabel("Time (ns)")
     plt.ylabel("Domain Wall Displacement (m)")
     plt.title("Domain Wall Displacement vs. Time (1D Model)")
@@ -213,7 +213,7 @@ def plot_transmission_and_amplitude():
     plt.plot(freq_range, T_vals, 'k-', label="Transmission Coefficient T")
     plt.plot(freq_range, amp_vals, 'r-', label="Spin-Wave Amplitude ρ")
     plt.xlabel("Frequency (GHz)")
-    plt.ylabel("Value")
+    plt.ylabel("T and rho")
     plt.title("Transmission Coefficient and Spin-Wave Amplitude")
     plt.legend()
     plt.grid(True)
