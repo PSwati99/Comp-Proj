@@ -177,7 +177,7 @@ def plot_displacement_curves():
     plt.title("Domain Wall Displacement vs. Time (1D Model)")
     plt.legend()
     plt.grid(True)
-    plt.savefig("test_displacement.png")
+    plt.savefig("test_displacement1.png")
     plt.show()
 
 def plot_velocity_curves(velocity_data):
@@ -197,7 +197,7 @@ def plot_velocity_curves(velocity_data):
     plt.title("Domain Wall Velocity vs. Frequency (1D Model)")
     plt.legend()
     plt.grid(True)
-    plt.savefig("test_velocity.png")
+    plt.savefig("test_velocity1.png")
     plt.show()
 
 def plot_transmission_and_amplitude():
@@ -217,7 +217,7 @@ def plot_transmission_and_amplitude():
     plt.title("Transmission Coefficient and Spin-Wave Amplitude")
     plt.legend()
     plt.grid(True)
-    plt.savefig("test_transmission.png")
+    plt.savefig("test_transmission1.png")
     plt.show()
 
 # =============================================================================
