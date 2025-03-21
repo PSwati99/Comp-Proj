@@ -2,58 +2,66 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
-# Define constants
-alpha = 0.01  # Damping coefficient
-gamma = 1.76e11  # Gyromagnetic ratio (rad/(s.T))
-Kd = 1e3  # Anisotropy constant (J/m^3)
-mu0 = 4 * np.pi * 1e-7  # Permeability of free space (T.m/A)
-Ms = 8e5  # Saturation magnetization (A/m)
+# Define physical parameters (SI units)
+mu0 = 4 * np.pi * 1e-7      # Vacuum permeability, H/m
+Ms = 8.6e5                  # Saturation magnetization, A/m
+alpha = 0.01                # Gilbert damping constant
+gamma = 2.21e5              # Gyromagnetic ratio, m/(A·s) (approximate)
+Nx_minus_Ny = 0.05          # Difference in demagnetizing factors
 
-# Driving strengths for different frequencies
-u_22GHz = 30   # Positive displacement effect
-u_70GHz = -50  # Negative displacement effect
-T = 0.5  # Spin polarization factor
+# Effective anisotropy for the Bloch wall:
+Kd = (Nx_minus_Ny) / (2 * mu0 * Ms**2)
 
-# Define the system of equations
-def model_equations(t, y, u):
+# Effective spin-wave parameter u.
+# u is chosen such that for T = 0 the wall is pushed forward (positive X)
+# and for T = 1 the wall is pulled backward (negative X).
+u = 0.4  # effective spin velocity in m/s (adjust as needed)
+
+# Precompute denominator (1+alpha^2)
+denom = 1 + alpha**2
+A = gamma * (Kd / (mu0 * Ms))  # factor multiplying sin(2phi)
+
+def wall_dynamics(t, y, T):
+    """
+    y[0] = X (wall position)
+    y[1] = phi (tilt angle in radians)
+    
+    T: transmission coefficient (T ~ 0: nearly full reflection; T ~ 1: nearly full transmission)
+    """
     X, phi = y
-    sin_2phi = np.sin(2 * phi)
+    dX_dt = (1/denom) * ( A * np.sin(2 * phi) - T * u + (1 - T) * alpha * u )
+    dphi_dt = (1/denom) * ( -A * np.sin(2 * phi) + (1 - T) * u + T * alpha * u )
+    return [dX_dt, dphi_dt]
 
-    # Corrected sign of the driving forces
-    dX_dt = (gamma * Kd * mu0 / Ms) * sin_2phi + T * u - (1 - T) * alpha * u
-    dPhi_dt = (-gamma * alpha * Kd * mu0 / Ms) * sin_2phi - (1 - T) * u - T * alpha * u
+# Time span for simulation: 0 to 50 ns
+t_start = 0
+t_end = 50e-9  # 50 ns
+t_eval = np.linspace(t_start, t_end, 1000)
 
-    return [dX_dt / (1 + alpha**2), dPhi_dt / (1 + alpha**2)]
+# Initial conditions: wall at X = 0 and phi = pi/2
+y0 = [0, np.pi/2]
 
-# Time range
-t_start, t_end = 0, 50  # in nanoseconds
-t_eval = np.linspace(t_start, t_end, 500)
+# Case 1: Low-frequency (20 GHz) with nearly full reflection (T ~ 0).
+T_low = 0.0  
+sol_low = solve_ivp(wall_dynamics, [t_start, t_end], y0, args=(T_low,), t_eval=t_eval)
 
-# Initial conditions
-y0 = [0, np.pi / 4]  # Initial displacement and angle
+# Case 2: High-frequency (70 GHz) with nearly full transmission (T ~ 1).
+T_high = 1.0  
+sol_high = solve_ivp(wall_dynamics, [t_start, t_end], y0, args=(T_high,), t_eval=t_eval)
 
-# Solve ODEs for 22 GHz (positive displacement)
-sol_22GHz = solve_ivp(model_equations, [t_start, t_end], y0, args=(u_22GHz,), t_eval=t_eval)
-
-# Solve ODEs for 70 GHz (negative displacement)
-sol_70GHz = solve_ivp(model_equations, [t_start, t_end], y0, args=(u_70GHz,), t_eval=t_eval)
-
-# Plot results
-plt.figure(figsize=(8, 6))
-plt.plot(sol_22GHz.t, sol_22GHz.y[0], label='Model Calculation (22 GHz)', color='red', linewidth=2)
-plt.plot(sol_70GHz.t, sol_70GHz.y[0], label='Model Calculation (70 GHz)', color='green', linestyle="dashed", linewidth=2)
-
-# Labels and Title
-plt.xlabel("Time (ns)")
-plt.ylabel("Domain Wall Displacement (nm)")
-plt.title("Domain Wall Displacement vs. Time")
-plt.axhline(0, color='black', linewidth=1)  # Reference line at X=0
+# Plot the wall displacement X(t) for both cases.
+# Convert time to nanoseconds and displacement to nanometers.
+plt.figure(figsize=(8, 5))
+plt.plot(sol_low.t * 1e9, sol_low.y[0] * 1e9, label='f ≈ 20 GHz (T = 0)', color='blue')
+plt.plot(sol_high.t * 1e9, sol_high.y[0] * 1e9, label='f = 70 GHz (T = 1)', color='red', linestyle='--')
+plt.xlabel('Time (ns)')
+plt.ylabel('Wall Displacement X (nm)')
+plt.title('Domain Wall Displacement vs. Time')
 plt.legend()
-plt.grid()
+plt.grid(True)
+plt.tight_layout()
 
-# Save the figure as a PNG file
-plt.savefig("domain_wall_displacement_fixed.png", dpi=300)
-
-# Show the plot
+# Save the figure in PNG format
+plt.savefig("domain_wall_displacement.png", dpi=300)
 plt.show()
 
