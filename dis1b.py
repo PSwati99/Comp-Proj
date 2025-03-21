@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
 
 alpha = 0.01
-beta  = 50.0   # Reflection boost factor (tune as needed)
+beta  = 200.0   # Reflection boost factor (tune as needed)
 u_const = 5.0
 A_const = 1e7
 
