@@ -1,12 +1,4 @@
 #!/usr/bin/env python3
-"""
-Test Code for Domain Wall Dynamics Simulation (No MPI)
---------------------------------------------------------
-✅ Tests key functions for accuracy
-✅ Generates 3 key graphs for quick analysis
-✅ Displays progress during execution
-✅ Designed to run in 4-5 minutes on a laptop
-"""
 
 import numpy as np
 from scipy.integrate import solve_ivp
@@ -51,7 +43,7 @@ def get_frequency_params(frequency):
 # =============================================================================
 # Monte Carlo Simulation
 # =============================================================================
-def run_monte_carlo(frequency, runs=100):
+def run_monte_carlo(frequency, runs=10):
     T, vg, u, k = get_frequency_params(frequency)
     t_span = (0, 50e-9)
     t_eval = np.linspace(t_span[0], t_span[1], 250)
@@ -65,7 +57,7 @@ def run_monte_carlo(frequency, runs=100):
         results += sol.y[0]
 
         # Progress display for Monte Carlo
-        progress = int(((i + 1) / runs) * 100)
+        progress = int(((i + 1) / runs) * 10)
         print(f"Monte Carlo Progress: {progress}%", end='\r')
 
     print("\nMonte Carlo Simulation Completed.")
