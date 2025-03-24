@@ -156,7 +156,7 @@ def parallel_frequency_sweep():
 def test_monte_carlo():
     # Test Monte Carlo simulation for 22 GHz with a few runs.
     frequency = 22e9
-    t_eval, X_avg = run_monte_carlo(frequency, runs=3)
+    t_eval, X_avg = run_monte_carlo(frequency, runs=10)
     assert t_eval.shape[0] == 50, "Expected 50 time evaluation points."
     assert X_avg.shape[0] == 50, "Expected 50 displacement points."
     print("Monte Carlo simulation test PASSED.")
