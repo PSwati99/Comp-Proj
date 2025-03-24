@@ -3,18 +3,11 @@
 Complete Code for Domain Wall Dynamics Simulation
 
 This code integrates:
-  • The domain wall dynamics model (using Eqs. 2 and 3 from the paper)
-  • Monte Carlo simulation (5000 runs) to obtain robust displacement curves
-  • MPI-parallel frequency sweep for analytical velocity calculation (Eqs. 4 and 5)
+  • The domain wall dynamics model.
+  • Monte Carlo simulation (5000 runs) to obtain robust displacement curves.
+  • MPI-parallel frequency sweep for analytical velocity calculation.
   • Plotting functions for displacement, velocity, and transmission/amplitude graphs
-
-Before running, ensure that you have installed:
-    numpy, scipy, matplotlib, mpi4py
-
-Run using an MPI launcher, e.g.:
-    mpirun -np 4 python complete_code.py
 """
-
 import numpy as np
 from scipy.integrate import solve_ivp
 import matplotlib.pyplot as plt
@@ -34,7 +27,7 @@ Nx_minus_Ny = 0.05
 Kd = 0.5 * mu0 * Ms**2 * Nx_minus_Ny  # Effective anisotropy constant
 
 # =============================================================================
-# Domain Wall Dynamics ODE (Eqs. 2 and 3 from the paper)
+# Domain Wall Dynamics ODE 
 # =============================================================================
 def domain_wall_dynamics(t, y, alpha, T, u, k, Kd, Ms, gamma, mu0, delta):
     """
@@ -111,7 +104,7 @@ def run_monte_carlo(frequency, runs=5000):
     return t_eval, results / runs
 
 # =============================================================================
-# Analytical Velocity Formulas (Eqs. 4 and 5 from the paper)
+# Analytical Velocity Formulas
 # =============================================================================
 def get_velocity_analytical(T, u, k):
     """
