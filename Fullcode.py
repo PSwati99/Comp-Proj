@@ -1,21 +1,4 @@
 #!/usr/bin/env python3
-"""
-High-Resolution Parallel Simulation of Spin-Wave–Induced Domain Wall Motion
-
-This script replicates the main curves from Phys. Rev. B 86, 054445 (2012):
-    - Domain wall displacement vs. time (for 22 and 70 GHz)
-    - Initial and steady-state velocity vs. frequency
-    - Transmission coefficient and spin-wave amplitude vs. frequency
-
-Modifications to reach at least 1400 processor-hours on a single node (56 cores):
-    - Extended simulation time (1000 ns) with 10,000,000 time steps
-    - Increased frequency sweep (50,000 points)
-    - 5000 Monte Carlo runs per frequency to capture stochastic effects
-    - MPI parallelization across 56 cores
-
-Author: [Your Name]
-Date: [Today's Date]
-"""
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -23,7 +6,7 @@ from scipy.integrate import solve_ivp
 from mpi4py import MPI
 
 # =============================================================================
-# Material and Simulation Parameters (from paper)
+# Material and Simulation Parameters 
 # =============================================================================
 alpha = 0.01          
 Ms = 8.6e5           
