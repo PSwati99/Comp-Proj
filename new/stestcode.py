@@ -1,14 +1,4 @@
 #!/usr/bin/env python3
-"""
-Self-contained test code to verify the domain wall dynamics system on your machine.
-
-This script tests:
-  - The domain wall dynamics ODE solver with Monte Carlo simulation (with reduced runs)
-  - Frequency-dependent parameter extraction and analytical velocity calculations
-  - MPI-based frequency sweep for velocity calculations
-
-It prints summary results and basic assertions. Use mpirun/mpiexec to test MPI functionality.
-"""
 
 import numpy as np
 from scipy.integrate import solve_ivp
@@ -30,7 +20,7 @@ Nx_minus_Ny = 0.05
 Kd = 0.5 * mu0 * Ms**2 * Nx_minus_Ny  # Effective anisotropy constant
 
 # =============================================================================
-# Domain Wall Dynamics ODE (Eqs. 2 and 3 from the paper)
+# Domain Wall Dynamics ODE 
 # =============================================================================
 def domain_wall_dynamics(t, y, alpha, T, u, k, Kd, Ms, gamma, mu0, delta):
     """
@@ -105,7 +95,7 @@ def run_monte_carlo(frequency, runs=3):
     return t_eval, results / runs
 
 # =============================================================================
-# Analytical Velocity Functions (Eqs. 4 and 5 from the paper)
+# Analytical Velocity Functions
 # =============================================================================
 def get_velocity_analytical(T, u, k):
     """
