@@ -1,25 +1,4 @@
 #!/usr/bin/env python3
-"""
-Improved Domain Wall Dynamics Simulation Code with Analytical Velocities
-
-This code incorporates the analytical expressions for initial and steady‐state
-velocities as given in Phys. Rev. B 86, 054445 (2012) along with improved 
-frequency‐dependent functions for the transmission coefficient T(f) and 
-spin‐wave amplitude ρ(f) extracted from Fig. 4 of the paper.
-
-Analytical expressions:
-  v_i = [-T*u + (1-T)*α*u*k] / (1+α²)
-  v_s = ((1-T)*u*k) / α
-
-The plots are saved as PNG files:
-  - "dis1.png" for displacement vs. time,
-  - "vel1.png" for velocity vs. frequency,
-  - "trans1.png" for transmission coefficient and spin-wave amplitude vs. frequency.
-
-Author: [Your Name]
-Date: [Today's Date]
-"""
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.integrate import solve_ivp
@@ -34,16 +13,16 @@ gamma = 2.21e5                  # Gyromagnetic ratio (m/(A·s))
 Nx_minus_Ny = 0.05
 Kd = 0.5 * mu0 * Ms**2 * Nx_minus_Ny  # Effective anisotropy (J/m^3)
 
-# Typical domain wall width (taken from paper ~19-20 nm)
+# Typical domain wall width 
 delta = 20e-9
 
 # =======================
-# Refined Frequency-Dependent Functions (based on Fig. 4)
+# Refined Frequency-Dependent Functions
 # =======================
 
 def reflection_coefficient(f_GHz):
     """
-    Reflection coefficient R(f) based on Fig. 4.
+    Reflection coefficient R(f) 
     Uses a Gaussian peak near 50 GHz to mimic enhanced reflection.
     Below 18 GHz, we assume no propagation.
     """
@@ -64,7 +43,7 @@ def transmission_coefficient(f_GHz):
 
 def spin_wave_amplitude(f_GHz):
     """
-    Spin-wave amplitude ρ(f) based on Fig. 4.
+    Spin-wave amplitude ρ(f) 
     Below 18 GHz, returns 0 (cutoff).
     For f >= 18 GHz, amplitude decays roughly as 1/(1+(f/25)^2)
     with a mild resonance bump near 50 GHz.
@@ -100,7 +79,7 @@ def magnon_velocity_u(f_GHz):
     return (gamma * hbar * n * vg) / (mu0 * Ms)
 
 # =======================
-# Domain Wall ODE System (Incorporating the analytical formulas)
+# Domain Wall ODE System 
 # =======================
 
 def domain_wall_ode(t, y, f_GHz):
@@ -160,7 +139,7 @@ def run_monte_carlo(f_GHz, t_end=50e-9, num_points=5000, runs=20):
     return t_eval, X_avg
 
 # =======================
-# Analytical Velocity Functions (from the paper)
+# Analytical Velocity Functions
 # =======================
 
 def analytical_initial_velocity(f_GHz):
@@ -223,7 +202,6 @@ def frequency_sweep_velocity(freqs_GHz, t_end=50e-9, num_points=5000, runs=20):
 def plot_displacement_curves():
     """
     Plot displacement vs. time for two example frequencies: 22 GHz and 70 GHz.
-    Saves the figure as "dis1.png".
     """
     plt.figure(figsize=(8,6))
     for f in [22.0, 70.0]:
@@ -240,7 +218,6 @@ def plot_displacement_curves():
 def plot_velocity_curves(velocity_data):
     """
     Plot simulated and analytical initial and steady-state velocities vs. frequency.
-    Saves the figure as "vel1.png".
     """
     freqs = velocity_data[:, 0]
     sim_vi = velocity_data[:, 1]
