@@ -26,9 +26,6 @@ def domain_wall_dynamics(t, y, alpha, T, u, k, Kd, Ms, gamma, mu0, delta):
     """
     ODE system for domain wall dynamics.
     
-    y[0]: Wall displacement X
-    y[1]: Wall tilt angle phi
-
     dX/dt = [γ*(Kd/(μ0*Ms))*sin(2φ) - T*u + (1-T)*α*δ*u*k] / (1+α²)
     dφ/dt = [-γ*α*(Kd/(μ0*Ms))*sin(2φ) + (1-T)*u*k + T*α*u/δ] / (1+α²)
     """
@@ -52,17 +49,17 @@ def get_frequency_params(frequency):
     For other frequencies, placeholder values are used.
     """
     if frequency == 22e9:
-        T = 0.4       # Stronger reflection at 22 GHz
-        vg = 1000.0   # Example group velocity (m/s)
-        u = 35.0      # Example spin current parameter
+        T = 0.4      
+        vg = 1000.0   
+        u = 35.0      
     elif frequency == 70e9:
-        T = 0.98      # Nearly full transmission at 70 GHz
-        vg = 2000.0   # Example group velocity (m/s)
-        u = 16.0      # Example spin current parameter
+        T = 0.98      
+        vg = 2000.0   
+        u = 16.0      
     else:
-        T = 0.7       # Placeholder
-        vg = 1500.0   # Placeholder
-        u = 25.0      # Placeholder
+        T = 0.7       
+        vg = 1500.0   
+        u = 25.0      
         print(f"Using placeholder T, vg, u for frequency: {frequency/1e9:.0f} GHz")
     k = 2 * np.pi * frequency / vg
     return T, vg, u, k
@@ -80,13 +77,13 @@ def run_monte_carlo(frequency, runs=3):
       X_avg: Averaged wall displacement curve
     """
     T, vg, u, k = get_frequency_params(frequency)
-    t_span = (0, 50e-9)  # 0 to 50 ns
-    t_eval = np.linspace(t_span[0], t_span[1], 50)  # 50 time points (reduced for testing)
-    y0 = [0, np.pi/2]    # Initial conditions: X = 0, φ = π/2
+    t_span = (0, 50e-9)  
+    t_eval = np.linspace(t_span[0], t_span[1], 50)  
+    y0 = [0, np.pi/2]    
     results = np.zeros(len(t_eval))
     
     for _ in range(runs):
-        # Introduce slight Gaussian noise to initial φ
+        
         y0_noise = [0, np.pi/2 + np.random.normal(0, 0.01)]
         sol = solve_ivp(lambda t, y: domain_wall_dynamics(t, y, alpha, T, u, k, Kd, Ms, gamma, mu0, delta),
                         t_span, y0_noise, method='RK45', t_eval=t_eval, rtol=1e-6, atol=1e-8)
@@ -120,7 +117,7 @@ def parallel_frequency_sweep():
     rank = comm.Get_rank()
     size = comm.Get_size()
     
-    # For testing, use a reduced frequency range (20 GHz to 80 GHz with 100 points)
+    For testing, use a reduced frequency range (20 GHz to 80 GHz with 100 points)
     frequencies = np.linspace(20e9, 80e9, 100)
     freq_local = frequencies[rank::size]
     local_results = []
@@ -133,7 +130,7 @@ def parallel_frequency_sweep():
     all_results = comm.gather(local_results, root=0)
     
     if rank == 0:
-        # Flatten and sort results by frequency
+        
         all_results = [item for sublist in all_results for item in sublist]
         all_results.sort(key=lambda x: x[0])
         return np.array(all_results)
@@ -144,7 +141,7 @@ def parallel_frequency_sweep():
 # Test Functions
 # =============================================================================
 def test_monte_carlo():
-    # Test Monte Carlo simulation for 22 GHz with a few runs.
+    
     frequency = 22e9
     t_eval, X_avg = run_monte_carlo(frequency, runs=3)
     assert t_eval.shape[0] == 50, "Expected 50 time evaluation points."
@@ -154,7 +151,7 @@ def test_monte_carlo():
     print(f"Sample displacement (nm): {X_avg[0]*1e9:.2f} nm")
 
 def test_velocity_functions():
-    # Test frequency-dependent parameter extraction and analytical velocity functions.
+    
     frequency = 22e9
     T, vg, u, k = get_frequency_params(frequency)
     vi, vs = get_velocity_analytical(T, u, k)
@@ -164,7 +161,7 @@ def test_velocity_functions():
     print(f"At {frequency/1e9:.0f} GHz: vi = {vi:.2f} m/s, vs = {vs:.2f} m/s")
 
 def test_mpi_sweep():
-    # Test the MPI parallel frequency sweep.
+    
     velocity_data = parallel_frequency_sweep()
     comm = MPI.COMM_WORLD
     rank = comm.Get_rank()
@@ -183,15 +180,6 @@ def main():
     test_mpi_sweep()
     print("All tests completed successfully.")
     
-    # Optionally, plot a quick displacement curve for visual inspection.
-    # (Uncomment the following lines to see the plot.)
-    # t_eval, X_avg = run_monte_carlo(22e9, runs=3)
-    # plt.plot(t_eval*1e9, X_avg*1e9, 'o-')
-    # plt.xlabel("Time (ns)")
-    # plt.ylabel("Displacement (nm)")
-    # plt.title("Test Displacement Curve at 22 GHz")
-    # plt.grid(True)
-    # plt.show()
 
 if __name__ == "__main__":
     main()
