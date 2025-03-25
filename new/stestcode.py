@@ -67,7 +67,7 @@ def get_frequency_params(frequency):
 # =============================================================================
 # Monte Carlo Simulation Function for Displacement Curves
 # =============================================================================
-def run_monte_carlo(frequency, runs=3):
+def run_monte_carlo(frequency, runs=10):
     """
     Runs Monte Carlo simulations for a given frequency.
     
