@@ -23,9 +23,9 @@ Kd = 0.5 * mu0 * Ms**2 * Nx_minus_Ny
 # =============================================================================
 def domain_wall_dynamics(t, y, alpha, T, u, k, Kd, Ms, gamma, mu0, delta):
     X, phi = y
-    dXdt = (gamma * (Kd/(mu0*Ms)) * np.sin(2*phi) - T*u + (1-T)*alpha*delta*u*k) / (1 + alpha**2)
-    dphidt = (-gamma * alpha * (Kd/(mu0*Ms)) * np.sin(2*phi) + (1-T)*u*k + T*alpha*u/delta) / (1 + alpha**2)
-    return [dXdt, dphidt]
+    dX/dt = [γ*(Kd/(μ0*Ms))*sin(2φ) - T*u + (1-T)*α*δ*u*k] / (1+α²)
+    dφ/dt = [-γ*α*(Kd/(μ0*Ms))*sin(2φ) + (1-T)*u*k + T*α*u/δ] / (1+α²)
+    return [dX/dt, dφ/dt]
 
 # =============================================================================
 # Frequency Parameters
